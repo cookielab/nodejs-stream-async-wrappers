@@ -16,6 +16,7 @@
         "node": ">=8.0.0"
     },
     "dependencies": {
+        "semaphore-async-await": "^1.5.1"
     },
     "devDependencies": {
         "@cookielab.io/eslint-config-server": "0.0.6",
