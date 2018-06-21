@@ -2,6 +2,10 @@
     "name": "@cookielab.io/stream-async-wrappers",
     "version": "0.2.0",
     "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/cookielab/nodejs-stream-async-wrappers.git"
+    },
     "main": "lib/index.js",
     "scripts": {
         "build": "bin/build",
