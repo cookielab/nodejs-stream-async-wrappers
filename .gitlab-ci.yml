@@ -73,7 +73,7 @@ github:
     - git config --global user.email "robot@cookielab.io"
     - git config --global user.name "Cookie Monster"
   script:
-    - git remote rm mirror
+    - git remote rm mirror || true
     - git remote add mirror git@github.com:cookielab/nodejs-stream-async-wrappers.git
     - git checkout -B master origin/master
     - git push mirror master
