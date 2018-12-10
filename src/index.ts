@@ -1,5 +1,3 @@
-// @flow
-
 import ReadableStreamAsyncReader from './ReadableStreamAsyncReader';
 import WritableStreamAsyncWriter from './WritableStreamAsyncWriter';
 

@@ -1,7 +1,0 @@
-{
-    "settings": {
-        "flowtype": {
-          "onlyFilesWithFlowAnnotation": true
-        }
-    }
-}

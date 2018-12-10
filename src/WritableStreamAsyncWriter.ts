@@ -1,15 +1,14 @@
-// @flow
-
 import {Lock} from 'semaphore-async-await';
 import {Writable} from 'stream';
-import type {Callback, Chunk} from './types';
+
+type Callback = (error?: Error | null) => void;
 
 export default class WritableStreamAsyncWriter {
-    stream: Writable;
-    lock: Lock;
-    writablePromise: ?Promise<void>;
+    private readonly stream: Writable;
+    private readonly lock: Lock;
+    private writablePromise: Promise<void> | null;
 
-    constructor(stream: Writable): void {
+    constructor(stream: Writable) {
         this.stream = stream;
         this.lock = new Lock();
         this.writablePromise = null;
@@ -22,12 +21,12 @@ export default class WritableStreamAsyncWriter {
         }
     }
 
-    async write(chunk: Chunk, encoding?: string, callback?: Callback): Promise<void> {
+    async write(chunk: string | Buffer | any, encoding?: string, callback?: Callback): Promise<void> {
         await this.lock.execute(async (): Promise<void> => {
             await this.waitForDrain();
             const continueWriting = this.stream.write(chunk, encoding, callback);
             if (!continueWriting) {
-                this.writablePromise = new Promise((resolve: () => void, reject: (Error) => void): void => {
+                this.writablePromise = new Promise((resolve: () => void, reject: (error: Error) => void): void => {
                     this.stream.once('error', reject);
                     this.stream.once('drain', (): void => {
                         this.stream.removeListener('error', reject);
@@ -41,7 +40,7 @@ export default class WritableStreamAsyncWriter {
     async end(callback?: Callback): Promise<void> {
         await this.lock.execute(async (): Promise<void> => {
             await this.waitForDrain();
-            const finishPromise = new Promise((resolve: () => void, reject: (Error) => void): void => {
+            const finishPromise = new Promise((resolve: () => void, reject: (error: Error) => void): void => {
                 this.stream.once('error', reject);
                 this.stream.once('finish', (): void => {
                     this.stream.removeListener('error', reject);

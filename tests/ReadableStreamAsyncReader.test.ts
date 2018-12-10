@@ -1,17 +1,14 @@
 import {PassThrough} from 'stream';
 import ReadableStreamAsyncReader from '../src/ReadableStreamAsyncReader';
 
-let stream = null;
+let stream = new PassThrough();
 beforeEach(() => {
     stream = new PassThrough();
 });
-afterEach(() => {
-    stream = null;
-});
 
-describe('ReadableStreamAwaitReader', () => {
+describe('ReadableStreamAsyncReader', () => {
     describe('read', () => {
-        let readSpy = null;
+        let readSpy: jest.SpyInstance | null = null;
         beforeEach(() => {
             readSpy = jest.spyOn(stream, 'read');
         });

@@ -1,18 +1,17 @@
 import {PassThrough} from 'stream';
 import WritableStreamAsyncWriter from '../src/WritableStreamAsyncWriter';
 
-let stream = null;
+type WriteCallback = (chunk: string) => void;
+
+let stream = new PassThrough();
 beforeEach(() => {
     stream = new PassThrough();
 });
-afterEach(() => {
-    stream = null;
-});
 
-describe('WritableStreamAwaitWriter', () => {
+describe('WritableStreamAsyncWriter', () => {
     describe('write', () => {
-        let writeSpy = null;
-        let originalWrite = null;
+        let writeSpy: jest.SpyInstance | null = null;
+        let originalWrite: WriteCallback | null = null;
         beforeEach(() => {
             originalWrite = stream.write.bind(stream);
             writeSpy = jest.spyOn(stream, 'write');
@@ -23,7 +22,9 @@ describe('WritableStreamAwaitWriter', () => {
                 writeSpy.mockRestore();
                 writeSpy = null;
             }
-            originalWrite = null;
+            if (originalWrite != null) {
+                originalWrite = null;
+            }
         });
 
         it('writes chunks in series one chunk at a time', async () => {
@@ -43,10 +44,14 @@ describe('WritableStreamAwaitWriter', () => {
         });
 
         it('awaits writing of next chunk until drain event', async () => {
-            writeSpy.mockImplementationOnce((chunk) => {
-                originalWrite(chunk);
-                return false;
-            });
+            if (writeSpy != null) {
+                writeSpy.mockImplementationOnce((chunk: string) => {
+                    if (originalWrite != null) {
+                        originalWrite(chunk);
+                    }
+                    return false;
+                });
+            }
 
             const writer = new WritableStreamAsyncWriter(stream);
 
@@ -66,7 +71,7 @@ describe('WritableStreamAwaitWriter', () => {
     });
 
     describe('end', () => {
-        let endSpy = null;
+        let endSpy: jest.SpyInstance | null = null;
         beforeEach(() => {
             endSpy = jest.spyOn(stream, 'end');
         });
