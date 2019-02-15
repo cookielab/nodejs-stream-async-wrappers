@@ -1,6 +1,6 @@
 import {Readable} from 'stream';
 
-type ReadableResolver = (...args: any[]) => any;
+type ReadableResolver = () => void;
 
 type Chunk = string | Buffer | any;
 
