@@ -1,7 +1,9 @@
 import {Lock} from 'semaphore-async-await';
 import {Writable} from 'stream';
 
-type Callback = (error?: Error | null) => void;
+interface Callback {
+    (error?: Error | null): void;
+}
 
 export default class WritableStreamAsyncWriter {
     private readonly stream: Writable;

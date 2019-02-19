@@ -1,7 +1,9 @@
 import {PassThrough} from 'stream';
 import WritableStreamAsyncWriter from '../src/WritableStreamAsyncWriter';
 
-type WriteCallback = (chunk: string) => void;
+interface WriteCallback {
+    (chunk: string): void;
+}
 
 let stream = new PassThrough();
 beforeEach(() => {
