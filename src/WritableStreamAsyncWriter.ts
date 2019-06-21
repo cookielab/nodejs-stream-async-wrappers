@@ -26,7 +26,9 @@ export default class WritableStreamAsyncWriter {
     async write(chunk: string | Buffer | any, encoding?: string, callback?: Callback): Promise<void> {
         await this.lock.execute(async (): Promise<void> => {
             await this.waitForDrain();
-            const continueWriting = this.stream.write(chunk, encoding, callback);
+            const continueWriting = encoding != null
+                ? this.stream.write(chunk, encoding, callback)
+                : this.stream.write(chunk, callback);
             if (!continueWriting) {
                 this.writablePromise = new Promise((resolve: () => void, reject: (error: Error) => void): void => {
                     this.stream.once('error', reject);

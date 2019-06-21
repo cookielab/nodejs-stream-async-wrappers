@@ -40,9 +40,9 @@ describe('WritableStreamAsyncWriter', () => {
             await Promise.all(promises);
 
             expect(writeSpy).toHaveBeenCalledTimes(3);
-            expect(writeSpy).toHaveBeenCalledWith('chunk1', undefined, undefined);
-            expect(writeSpy).toHaveBeenCalledWith('chunk2', undefined, undefined);
-            expect(writeSpy).toHaveBeenCalledWith('chunk3', undefined, undefined);
+            expect(writeSpy).toHaveBeenNthCalledWith(1, 'chunk1', undefined);
+            expect(writeSpy).toHaveBeenNthCalledWith(2, 'chunk2', undefined);
+            expect(writeSpy).toHaveBeenNthCalledWith(3, 'chunk3', undefined);
         });
 
         it('awaits writing of next chunk until drain event', async () => {
@@ -61,14 +61,15 @@ describe('WritableStreamAsyncWriter', () => {
             const promise = writer.write('chunk2');
 
             expect(writeSpy).toHaveBeenCalledTimes(1);
-            expect(writeSpy).toHaveBeenCalledWith('chunk1', undefined, undefined);
+            expect(writeSpy).toHaveBeenNthCalledWith(1, 'chunk1', undefined);
 
             stream.emit('drain');
 
             await promise;
 
             expect(writeSpy).toHaveBeenCalledTimes(2);
-            expect(writeSpy).toHaveBeenCalledWith('chunk2', undefined, undefined);
+            expect(writeSpy).toHaveBeenNthCalledWith(1, 'chunk1', undefined);
+            expect(writeSpy).toHaveBeenNthCalledWith(2, 'chunk2', undefined);
         });
     });
 
