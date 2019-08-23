@@ -2,97 +2,98 @@ import {PassThrough} from 'stream';
 import WritableStreamAsyncWriter from '../src/WritableStreamAsyncWriter';
 
 interface WriteCallback {
-    (chunk: string): void;
+	(chunk: string): void;
 }
 
 let stream = new PassThrough();
 beforeEach(() => {
-    stream = new PassThrough();
+	stream = new PassThrough();
 });
 
 describe('WritableStreamAsyncWriter', () => {
-    describe('write', () => {
-        let writeSpy: jest.SpyInstance | null = null;
-        let originalWrite: WriteCallback | null = null;
-        beforeEach(() => {
-            originalWrite = stream.write.bind(stream);
-            writeSpy = jest.spyOn(stream, 'write');
-        });
-        afterEach(() => {
-            if (writeSpy != null) {
-                writeSpy.mockReset();
-                writeSpy.mockRestore();
-                writeSpy = null;
-            }
-            if (originalWrite != null) {
-                originalWrite = null;
-            }
-        });
+	describe('write', () => {
+		let writeSpy: jest.SpyInstance | null = null;
+		let originalWrite: WriteCallback | null = null;
+		beforeEach(() => {
+			originalWrite = stream.write.bind(stream);
+			writeSpy = jest.spyOn(stream, 'write');
+		});
+		afterEach(() => {
+			if (writeSpy != null) {
+				writeSpy.mockReset();
+				writeSpy.mockRestore();
+				writeSpy = null;
+			}
+			if (originalWrite != null) {
+				originalWrite = null;
+			}
+		});
 
-        it('writes chunks in series one chunk at a time', async () => {
-            const writer = new WritableStreamAsyncWriter(stream);
+		it('writes chunks in series one chunk at a time', async () => {
+			const writer = new WritableStreamAsyncWriter(stream);
 
-            const chunks = ['chunk1', 'chunk2', 'chunk3'];
-            const promises = chunks.map((chunk) => {
-                return writer.write(chunk);
-            });
+			const chunks = ['chunk1', 'chunk2', 'chunk3'];
+			const promises = chunks.map((chunk: string) => {
+				return writer.write(chunk);
+			});
 
-            await Promise.all(promises);
+			await Promise.all(promises);
 
-            expect(writeSpy).toHaveBeenCalledTimes(3);
-            expect(writeSpy).toHaveBeenNthCalledWith(1, 'chunk1', undefined);
-            expect(writeSpy).toHaveBeenNthCalledWith(2, 'chunk2', undefined);
-            expect(writeSpy).toHaveBeenNthCalledWith(3, 'chunk3', undefined);
-        });
+			expect(writeSpy).toHaveBeenCalledTimes(3);
+			expect(writeSpy).toHaveBeenNthCalledWith(1, 'chunk1', undefined);
+			expect(writeSpy).toHaveBeenNthCalledWith(2, 'chunk2', undefined);
+			expect(writeSpy).toHaveBeenNthCalledWith(3, 'chunk3', undefined);
+		});
 
-        it('awaits writing of next chunk until drain event', async () => {
-            if (writeSpy != null) {
-                writeSpy.mockImplementationOnce((chunk: string) => {
-                    if (originalWrite != null) {
-                        originalWrite(chunk);
-                    }
-                    return false;
-                });
-            }
+		it('awaits writing of next chunk until drain event', async () => {
+			if (writeSpy != null) {
+				writeSpy.mockImplementationOnce((chunk: string) => {
+					if (originalWrite != null) {
+						originalWrite(chunk);
+					}
 
-            const writer = new WritableStreamAsyncWriter(stream);
+					return false;
+				});
+			}
 
-            await writer.write('chunk1');
-            const promise = writer.write('chunk2');
+			const writer = new WritableStreamAsyncWriter(stream);
 
-            expect(writeSpy).toHaveBeenCalledTimes(1);
-            expect(writeSpy).toHaveBeenNthCalledWith(1, 'chunk1', undefined);
+			await writer.write('chunk1');
+			const promise = writer.write('chunk2');
 
-            stream.emit('drain');
+			expect(writeSpy).toHaveBeenCalledTimes(1);
+			expect(writeSpy).toHaveBeenNthCalledWith(1, 'chunk1', undefined);
 
-            await promise;
+			stream.emit('drain');
 
-            expect(writeSpy).toHaveBeenCalledTimes(2);
-            expect(writeSpy).toHaveBeenNthCalledWith(1, 'chunk1', undefined);
-            expect(writeSpy).toHaveBeenNthCalledWith(2, 'chunk2', undefined);
-        });
-    });
+			await promise;
 
-    describe('end', () => {
-        let endSpy: jest.SpyInstance | null = null;
-        beforeEach(() => {
-            endSpy = jest.spyOn(stream, 'end');
-        });
-        afterEach(() => {
-            if (endSpy != null) {
-                endSpy.mockReset();
-                endSpy.mockRestore();
-                endSpy = null;
-            }
-        });
+			expect(writeSpy).toHaveBeenCalledTimes(2);
+			expect(writeSpy).toHaveBeenNthCalledWith(1, 'chunk1', undefined);
+			expect(writeSpy).toHaveBeenNthCalledWith(2, 'chunk2', undefined);
+		});
+	});
 
-        it('recalls end of stream', async () => {
-            const callback = jest.fn();
-            const writer = new WritableStreamAsyncWriter(stream);
-            await writer.end(callback);
+	describe('end', () => {
+		let endSpy: jest.SpyInstance | null = null;
+		beforeEach(() => {
+			endSpy = jest.spyOn(stream, 'end');
+		});
+		afterEach(() => {
+			if (endSpy != null) {
+				endSpy.mockReset();
+				endSpy.mockRestore();
+				endSpy = null;
+			}
+		});
 
-            expect(endSpy).toHaveBeenCalledTimes(1);
-            expect(endSpy).toHaveBeenCalledWith(callback);
-        });
-    });
+		it('recalls end of stream', async () => {
+			const callback = jest.fn();
+			const writer = new WritableStreamAsyncWriter(stream);
+			await writer.end(callback);
+
+			expect(endSpy).toHaveBeenCalledTimes(1);
+			expect(endSpy).toHaveBeenCalledWith(callback);
+		});
+	});
 });
