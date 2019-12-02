@@ -33,8 +33,8 @@ describe('WritableStreamAsyncWriter', () => {
 			const writer = new WritableStreamAsyncWriter(stream);
 
 			const chunks = ['chunk1', 'chunk2', 'chunk3'];
-			const promises = chunks.map((chunk: string) => {
-				return writer.write(chunk);
+			const promises = chunks.map(async (chunk: string): Promise<void> => {
+				return await writer.write(chunk);
 			});
 
 			await Promise.all(promises);

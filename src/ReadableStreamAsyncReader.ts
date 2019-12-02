@@ -52,6 +52,6 @@ export default class ReadableStreamAsyncReader {
 			}
 		}
 
-		return chunk;
+		return await chunk;
 	}
 }
