@@ -24,7 +24,7 @@
     "semaphore-async-await": "^1.5.1"
   },
   "devDependencies": {
-    "@cookielab.io/eslint-config-server": "3.0.5",
+    "@cookielab.io/eslint-config-server": "4.0.0",
     "@types/jest": "24.0.25",
     "@types/node": "13.1.6",
     "@typescript-eslint/eslint-plugin": "2.15.0",
