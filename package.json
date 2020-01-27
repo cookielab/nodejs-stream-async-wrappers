@@ -35,8 +35,8 @@
     "eslint-plugin-import": "2.20.0",
     "eslint-plugin-sort-imports-es6-autofix": "0.5.0",
     "flowgen": "1.10.0",
-    "jest": "24.9.0",
-    "ts-jest": "24.3.0",
+    "jest": "25.1.0",
+    "ts-jest": "25.0.0",
     "typescript": "3.7.5"
   },
   "jest": {
