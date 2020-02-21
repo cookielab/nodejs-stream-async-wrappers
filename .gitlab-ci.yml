@@ -3,7 +3,7 @@ stages:
   - test
   - publish
 
-.yarn_template: &yarn_definition
+.yarn_template:
   image: cookielab/nodejs:$NODE_VERSION
   stage: prepare
   tags:
@@ -20,16 +20,16 @@ stages:
       - node_modules
 
 'yarn 10/12':
-  <<: *yarn_definition
+  extends: .yarn_template
   variables:
     NODE_VERSION: 10
 
 'yarn 12/12':
-  <<: *yarn_definition
+  extends: .yarn_template
   variables:
     NODE_VERSION: 12
 
-.lint_template: &lint_definition
+.lint_template:
   image: cookielab/nodejs:$NODE_VERSION
   stage: test
   tags:
@@ -38,20 +38,20 @@ stages:
     - bin/lint
 
 'lint 10/12':
-  <<: *lint_definition
+  extends: .lint_template
   dependencies:
     - 'yarn 10/12'
   variables:
     NODE_VERSION: 10
 
 'lint 12/12':
-  <<: *lint_definition
+  extends: .lint_template
   dependencies:
     - 'yarn 12/12'
   variables:
     NODE_VERSION: 12
 
-.typescript_template: &typescript_definition
+.typescript_template:
   image: cookielab/nodejs:$NODE_VERSION
   stage: test
   tags:
@@ -60,20 +60,20 @@ stages:
     - bin/typescript
 
 'typescript 10/12':
-  <<: *typescript_definition
+  extends: .typescript_template
   dependencies:
     - 'yarn 10/12'
   variables:
     NODE_VERSION: 10
 
 'typescript 12/12':
-  <<: *typescript_definition
+  extends: .typescript_template
   dependencies:
     - 'yarn 12/12'
   variables:
     NODE_VERSION: 12
 
-.test_template: &test_definition
+.test_template:
   image: cookielab/nodejs:$NODE_VERSION
   stage: test
   tags:
@@ -82,14 +82,14 @@ stages:
     - bin/jest
 
 'test 10/12':
-  <<: *test_definition
+  extends: .test_template
   dependencies:
     - 'yarn 10/12'
   variables:
     NODE_VERSION: 10
 
 'test 12/12':
-  <<: *test_definition
+  extends: .test_template
   dependencies:
     - 'yarn 12/12'
   variables:
